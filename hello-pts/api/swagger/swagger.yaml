@@ -1,0 +1,216 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: PTS - API
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /hello:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: hello_pts
+    get:
+      description: Returns 'Hello' to the caller
+      # used as the method name of the controller
+      operationId: hello
+      parameters:
+        - in: query
+          name: name
+          description: The name of the person to whom to say hello
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/HelloPTSResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /{tid}/fs:
+    x-swagger-router-controller: fs_controller
+    get:
+      description: Get a list of all known files in the local cache of the spacecraft storage. This is the current state of the ground segment and can be different from the spacecraft.
+      # used as the method name of the controller
+      operationId: allFS
+      parameters:
+        - in: path
+          name: tid
+          description: The Target ID - The ID of the target spacecraft
+          required: true
+          type: string
+        - in: query
+          name: location
+          description: Files on the ground or spacecraft
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/File'
+        '400':
+          description: Bad request. Plz check your query params.
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: not found (nothing happens)
+        '500':
+          description: Internal Server Error (nothing happens)
+  /{tid}/dl:
+    x-swagger-router-controller: fs_controller
+    get:
+      description: Get a list of all files in the download storage.
+      # used as the method name of the controller
+      operationId: allDL
+      parameters:
+        - in: path
+          name: tid
+          description: The Target ID - The ID of the target spacecraft
+          required: true
+          type: string
+        - in: query
+          name: location
+          description: Files on the ground or spacecraft
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/File'
+        '400':
+          description: Bad request. Plz check your query params.
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: not found (nothing happens)
+        '500':
+          description: Internal Server Error (nothing happens)
+  /{tid}/up:
+    x-swagger-router-controller: fs_controller
+    get:
+      description: Get a list of all files in the upload storage.
+      # used as the method name of the controller
+      operationId: allUP
+      parameters:
+        - in: path
+          name: tid
+          description: The Target ID - The ID of the target spacecraft
+          required: true
+          type: string
+        - in: query
+          name: location
+          description: Files on the ground or spacecraft
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/File'
+        '400':
+          description: Bad request. Plz check your query params.
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: not found (nothing happens)
+        '500':
+          description: Internal Server Error (nothing happens)
+  /{tid}/fs/{filename}:
+    x-swagger-router-controller: fs_controller
+    get:
+      description: request to download a file from the spacecraft to ground station
+      # used as the method name of the controller
+      operationId: dlSpToGr
+      parameters:
+        - in: path
+          name: tid
+          description: The Target ID - The ID of the target spacecraft
+          required: true
+          type: string
+        - in: path
+          name: filename
+          description: File's name on the spacecraft
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 200 OK (send a command to the spacecraft)
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/File'
+        '400':
+          description: Bad request. Plz check your query params.
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: not found (nothing happens)
+        '500':
+          description: Internal Server Error (nothing happens)
+#      security:
+#        - file_auth:
+#            - 'write:files'
+#            - 'read:files'
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  File:
+    title: a File
+    description: A File either on the ground/spacecraft
+    type: object
+    required:
+      - tid
+      - location
+    properties:
+      tid:
+        type: string
+        description: The target ID (ID of the spacecraft)
+        example: ALQ-1, ALQ-2, ALINA
+      size:
+        type: string
+        description: The file size in bytes.
+      name:
+        type: string
+        description: The file name.
+      permissions:
+        type: string
+        description: The file permissions.
+      location:
+        type: string
+        description: Files on the ground or spacecraft.
+  HelloPTSResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string

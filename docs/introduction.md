@@ -23,7 +23,7 @@ Write your specification in YAML on the left, and see the API documentation in r
 ```yaml
 paths:
   /hello:
-    x-swagger-router-controller: "hello_world"  
+    x-swagger-router-controller: "hello_pts"  
 ```
 
 * Use the operationId property to specify which controller method to call for the given path:
@@ -34,11 +34,11 @@ paths:
       operationId: "hello"
 ```
 
-* Implement your controller files in Node.js and place them in `<project-root>/api/controllers`. For example: `<project-root>/api/controllers/hello_world.js` 
+* Implement your controller files in Node.js and place them in `<project-root>/api/controllers`. For example: `<project-root>/api/controllers/hello_pts.js` 
 
 * Behind the scenes, swagger wires up your app, routing HTTP requests to specific Node.js controller files. 
 
-* At runtime swagger-tools middleware validates the request before sending it to the `hello` operation of the `hello_world` controller. 
+* At runtime swagger-tools middleware validates the request before sending it to the `hello` operation of the `hello_pts` controller. 
 
 * Finally, the controller logic associated with the requested path is executed.
 

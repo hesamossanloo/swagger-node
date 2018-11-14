@@ -4,7 +4,7 @@ var server = require('../../../app');
 
 describe('controllers', function() {
 
-  describe('hello_world', function() {
+  describe('hello_pts', function() {
 
     describe('GET /hello', function() {
 

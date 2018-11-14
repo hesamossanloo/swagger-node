@@ -7,13 +7,13 @@
 
 ### <a name="implementing"></a>Implementing a controller
 
-This topic explains how to implement a controller. The `x-swagger-router-controller` Swagger extension element is used to specify the name of a controller file. The quick start example defines a `hello_world` controller file, which is by default in `api/controllers/hello_world.js`. 
+This topic explains how to implement a controller. The `x-swagger-router-controller` Swagger extension element is used to specify the name of a controller file. The quick start example defines a `hello_pts` controller file, which is by default in `api/controllers/hello_pts.js`. 
 
 ```yaml
 paths:
     /hello:
       # binds swagger app logic to a route
-      x-swagger-router-controller: hello_world
+      x-swagger-router-controller: hello_pts
 ```
 
 By default, controller method names map to the HTTP operation names, like get() or post(). But you can specify any name you wish with the `operationId` element. In the following example, a GET request results in calling the hello() method in the controller. 
@@ -25,7 +25,7 @@ By default, controller method names map to the HTTP operation names, like get() 
       operationId: hello
 ```
 
-Here is the `hello_world.js` implementation for the quick start example. It retrieves the query parameter value and returns a response. 
+Here is the `hello_pts.js` implementation for the quick start example. It retrieves the query parameter value and returns a response. 
 
 ```javascript
     var util = require('util');

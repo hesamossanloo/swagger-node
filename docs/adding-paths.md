@@ -17,7 +17,7 @@ The `/hello` path in the original Quick Start example looks like this:
   paths:
     /hello:
       # binds swagger app logic to a route
-      x-swagger-router-controller: hello_world
+      x-swagger-router-controller: hello_pts
       get:
         description: Returns 'Hello' to the caller
         # used as the method name of the controller
@@ -33,7 +33,7 @@ The `/hello` path in the original Quick Start example looks like this:
             description: Success
             schema:
               # a pointer to a definition
-              $ref: #/definitions/HelloWorldResponse
+              $ref: #/definitions/HelloPTSResponse
           # responses may fall through to errors
           default:
             description: Error
@@ -60,7 +60,7 @@ As noted previously, `the x-swagger-router-controller` maps a path to a controll
 ```yaml
 paths:
   /hello:
-    x-swagger-router-controller: hello_world
+    x-swagger-router-controller: hello_pts
     get:
       description: Returns 'Hello' to the caller
       # used as the method name of the controller
@@ -73,7 +73,7 @@ or at the operation level, like this:
 paths:
   /hello:
     get:
-      x-swagger-router-controller: hello_world
+      x-swagger-router-controller: hello_pts
       description: Returns 'Hello' to the caller
       # used as the method name of the controller
       operationId: hello

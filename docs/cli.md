@@ -132,7 +132,7 @@ Example:
     `swagger project test`
     
       controllers
-        hello_world
+        hello_pts
           GET /hello
             ✓ should return a default string
             ✓ should accept a name parameter

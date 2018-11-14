@@ -37,7 +37,7 @@ Here is the entire `swagger.yaml` file that is provisioned for a new swagger pro
     paths:
       /hello:
         # binds swagger app logic to a route
-        x-swagger-router-controller: hello_world
+        x-swagger-router-controller: hello_pts
         get:
           description: Returns 'Hello' to the caller
           # used as the method name of the controller
@@ -80,5 +80,5 @@ Here's a brief description of the elements in a swagger project file:
 
 * **definitions:** - (Optional) These represent the structure of complex objects such as request and response bodies. For example, you might have a collection of `/users` that returns an array of `user` objects. You would describe these with two definitions: 1) to describe the `User` object, and 2) the definition of the `Users` array. Swagger uses [JSON-schema](http://json-schema.org/).
 
-* **x-swagger-router-controller:** - (Optional) This extension specifies the name of the controller file (hello_world.js) that will execute when this API operation is called. Controller files reside in `apis/controllers` in your swagger project. This extension is provided through the [`swagger-tools`](https://github.com/apigee-127/swagger-tools) middleware module.
+* **x-swagger-router-controller:** - (Optional) This extension specifies the name of the controller file (hello_pts.js) that will execute when this API operation is called. Controller files reside in `apis/controllers` in your swagger project. This extension is provided through the [`swagger-tools`](https://github.com/apigee-127/swagger-tools) middleware module.
 
