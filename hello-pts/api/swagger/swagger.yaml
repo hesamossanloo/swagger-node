@@ -11,13 +11,19 @@ schemes:
   # tip: remove http to make production-grade
   - http
   - https
-# format of bodies a client can send (Content-Type)
+# format of bodies a client can s-- END (Content-Type)
 consumes:
   - application/json
 # format of the responses to the client (Accepts)
 produces:
   - application/json
+  
 paths:
+
+##############################
+#hello_pts controller -- BEGIN
+##############################
+  
   /hello:
     # binds a127 app logic to a route
     x-swagger-router-controller: hello_pts
@@ -42,8 +48,17 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/ErrorResponse"
+  
+############################
+#hello_pts controller -- END
+############################
+
+################################
+#file_system_controller -- BEGIN
+################################
+  
   /{tid}/fs:
-    x-swagger-router-controller: fs_controller
+    x-swagger-router-controller: file_system_controller
     get:
       description: Get a list of all known files in the local cache of the spacecraft storage. This is the current state of the ground segment and can be different from the spacecraft.
       # used as the method name of the controller
@@ -74,8 +89,60 @@ paths:
           description: not found (nothing happens)
         '500':
           description: Internal Server Error (nothing happens)
+
+
+  /{tid}/fs/{filename}:
+    x-swagger-router-controller: file_system_controller
+    get:
+      description: request to download a file from the spacecraft to ground station
+      # used as the method name of the controller
+      operationId: dlSpToGrRq
+      parameters:
+        - in: path
+          name: tid
+          description: The Target ID - The ID of the target spacecraft
+          required: true
+          type: string
+        - in: path
+          name: filename
+          description: File's name on the spacecraft
+          required: true
+          type: string
+        - in: query
+          name: location
+          description: Files on the ground or spacecraft
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 200 OK (s-- END a command to the spacecraft)
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/File'
+        '400':
+          description: Bad request. Plz check your query params.
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: not found (nothing happens)
+        '500':
+          description: Internal Server Error (nothing happens)
+#      security:
+#        - file_auth:
+#            - 'write:files'
+#            - 'read:files'
+
+##############################
+#file_system_controller -- END
+##############################
+
+#############################
+#download_controller -- BEGIN
+#############################
+
   /{tid}/dl:
-    x-swagger-router-controller: fs_controller
+    x-swagger-router-controller: download_controller
     get:
       description: Get a list of all files in the download storage.
       # used as the method name of the controller
@@ -106,8 +173,51 @@ paths:
           description: not found (nothing happens)
         '500':
           description: Internal Server Error (nothing happens)
+
+#  /{tid}/dl/{filename}:
+#    x-swagger-router-controller: download_controller
+#    get:
+#      description: request to download a file from the spacecraft to ground station
+#      # used as the method name of the controller
+#      operationId: dlSpToGr
+#      parameters:
+#        - in: path
+#          name: tid
+#          description: The Target ID - The ID of the target spacecraft
+#          required: true
+#          type: string
+#        - in: path
+#          name: filename
+#          description: File's name on the spacecraft
+#          required: true
+#          type: string
+#      responses:
+#        '200':
+#          description: 200 OK (s-- END a command to the spacecraft)
+#          schema:
+#            type: array
+#            items:
+#              $ref: '#/definitions/File'
+#        '400':
+#          description: Bad request. Plz check your query params.
+#        '401':
+#          description: Authorization information is missing or invalid.
+#        '404':
+#          description: not found (nothing happens)
+#        '500':
+#          description: Internal Server Error (nothing happens)
+
+
+  ###########################
+#download_controller -- END
+###########################
+
+###########################
+#upload_controller -- BEGIN
+###########################
+
   /{tid}/up:
-    x-swagger-router-controller: fs_controller
+    x-swagger-router-controller: upload_controller
     get:
       description: Get a list of all files in the upload storage.
       # used as the method name of the controller
@@ -138,45 +248,26 @@ paths:
           description: not found (nothing happens)
         '500':
           description: Internal Server Error (nothing happens)
-  /{tid}/fs/{filename}:
-    x-swagger-router-controller: fs_controller
-    get:
-      description: request to download a file from the spacecraft to ground station
-      # used as the method name of the controller
-      operationId: dlSpToGr
-      parameters:
-        - in: path
-          name: tid
-          description: The Target ID - The ID of the target spacecraft
-          required: true
-          type: string
-        - in: path
-          name: filename
-          description: File's name on the spacecraft
-          required: true
-          type: string
-      responses:
-        '200':
-          description: 200 OK (send a command to the spacecraft)
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/File'
-        '400':
-          description: Bad request. Plz check your query params.
-        '401':
-          description: Authorization information is missing or invalid.
-        '404':
-          description: not found (nothing happens)
-        '500':
-          description: Internal Server Error (nothing happens)
-#      security:
-#        - file_auth:
-#            - 'write:files'
-#            - 'read:files'
+
+#########################
+#upload_controller -- END
+#########################
+
+#################
+#swagger -- BEGIN
+#################
+
   /swagger:
     x-swagger-pipe: swagger_raw
-# complex objects have schema definitions
+    
+###############
+#swagger -- END
+###############
+
+##################################################
+# complex objects have schema definitions -- BEGIN
+##################################################
+
 definitions:
   File:
     title: a File
@@ -214,3 +305,7 @@ definitions:
     properties:
       message:
         type: string
+
+##################################################
+# complex objects have schema definitions -- END
+##################################################
