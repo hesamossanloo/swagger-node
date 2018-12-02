@@ -11,18 +11,20 @@ schemes:
   # tip: remove http to make production-grade
   - http
   - https
-# format of bodies a client can s-- END (Content-Type)
+# format of bodies a client can send (Content-Type)
 consumes:
   - application/json
+  - image/*
 # format of the responses to the client (Accepts)
 produces:
   - application/json
+  - image/*
   
 paths:
 
-##############################
-#hello_pts controller -- BEGIN
-##############################
+  ##############################
+  #hello_pts controller -- BEGIN
+  ##############################
   
   /hello:
     # binds a127 app logic to a route
@@ -49,13 +51,13 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
   
-############################
-#hello_pts controller -- END
-############################
+  ############################
+  #hello_pts controller -- END
+  ############################
 
-################################
-#file_system_controller -- BEGIN
-################################
+  ################################
+  #file_system_controller -- BEGIN
+  ################################
   
   /{tid}/fs:
     x-swagger-router-controller: file_system_controller
@@ -115,7 +117,7 @@ paths:
           type: string
       responses:
         '200':
-          description: 200 OK (s-- END a command to the spacecraft)
+          description: 200 OK (send a command to the spacecraft)
           schema:
             type: array
             items:
@@ -133,13 +135,13 @@ paths:
 #            - 'write:files'
 #            - 'read:files'
 
-##############################
-#file_system_controller -- END
-##############################
+  ##############################
+  #file_system_controller -- END
+  ##############################
 
-#############################
-#download_controller -- BEGIN
-#############################
+  #############################
+  #download_controller -- BEGIN
+  #############################
 
   /{tid}/dl:
     x-swagger-router-controller: download_controller
@@ -174,6 +176,43 @@ paths:
         '500':
           description: Internal Server Error (nothing happens)
 
+  /{tid}/dl/{filename}:
+    x-swagger-router-controller: download_controller
+    get:
+      description: Download file
+      # used as the method name of the controller
+      operationId: dlFile
+      parameters:
+        - in: path
+          name: tid
+          description: The Target ID - The ID of the target spacecraft
+          required: true
+          type: string
+        - in: path
+          name: filename
+          description: File's name on the spacecraft
+          required: true
+          type: string
+        - in: query
+          name: location
+          description: Files on the ground or spacecraft
+          required: true
+          type: string
+      responses:
+        '200':
+          description: A PNG file
+          schema:
+            type: string
+            format: binary
+        '400':
+          description: Bad request. Plz check your query params.
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: not found (nothing happens)
+        '500':
+          description: Internal Server Error (nothing happens)
+
 #  /{tid}/dl/{filename}:
 #    x-swagger-router-controller: download_controller
 #    get:
@@ -193,7 +232,7 @@ paths:
 #          type: string
 #      responses:
 #        '200':
-#          description: 200 OK (s-- END a command to the spacecraft)
+#          description: 200 OK (send a command to the spacecraft)
 #          schema:
 #            type: array
 #            items:
@@ -209,12 +248,12 @@ paths:
 
 
   ###########################
-#download_controller -- END
-###########################
+  #download_controller -- END
+  ###########################
 
-###########################
-#upload_controller -- BEGIN
-###########################
+  ###########################
+  #upload_controller -- BEGIN
+  ###########################
 
   /{tid}/up:
     x-swagger-router-controller: upload_controller
@@ -249,20 +288,20 @@ paths:
         '500':
           description: Internal Server Error (nothing happens)
 
-#########################
-#upload_controller -- END
-#########################
+  #########################
+  #upload_controller -- END
+  #########################
 
-#################
-#swagger -- BEGIN
-#################
+  #################
+  #swagger -- BEGIN
+  #################
 
   /swagger:
     x-swagger-pipe: swagger_raw
     
-###############
-#swagger -- END
-###############
+  ###############
+  #swagger -- END
+  ###############
 
 ##################################################
 # complex objects have schema definitions -- BEGIN
