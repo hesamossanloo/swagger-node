@@ -14,51 +14,67 @@ schemes:
 # format of bodies a client can send (Content-Type)
 consumes:
   - application/json
-  - image/*
+
 # format of the responses to the client (Accepts)
 produces:
   - application/json
-  - image/*
   
 paths:
-
-  ##############################
-  #hello_pts controller -- BEGIN
-  ##############################
-  
-  /hello:
-    # binds a127 app logic to a route
-    x-swagger-router-controller: hello_pts
-    get:
-      description: Returns 'Hello' to the caller
-      # used as the method name of the controller
-      operationId: hello
-      parameters:
-        - in: query
-          name: name
-          description: The name of the person to whom to say hello
-          required: false
-          type: string
-      responses:
-        "200":
-          description: Success
-          schema:
-            # a pointer to a definition
-            $ref: "#/definitions/HelloPTSResponse"
-        # responses may fall through to errors
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  
-  ############################
-  #hello_pts controller -- END
-  ############################
 
   ################################
   #file_system_controller -- BEGIN
   ################################
-  
+  /{tid}/rel:
+    x-swagger-router-controller: file_system_controller
+    get:
+      description: Returns the newest available reliable telemetry packet. Shall be polled continuously. Each packet will have a unique, auto-incrementing ID.
+      # used as the method name of the controller
+      operationId: relTelePackages
+      parameters:
+      - in: path
+        name: tid
+        description: The Target ID - The ID of the target spacecraft
+        required: true
+        type: string
+      responses:
+        '200':
+          description: 200 OK
+          schema:
+            $ref: '#/definitions/TelePackages'
+        '400':
+          description: Bad request. Plz check your query params.
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: not found (nothing happens)
+        '500':
+          description: Internal Server Error (nothing happens)
+  /{tid}/stm:
+    x-swagger-router-controller: file_system_controller
+    get:
+      description: Returns the newest available standard telemetry packages. Shall be polled continuously. Each package will have a unique, auto-incrementing ID.
+      # used as the method name of the controller
+      operationId: stdTelePackages
+      parameters:
+      - in: path
+        name: tid
+        description: The Target ID - The ID of the target spacecraft
+        required: true
+        type: string
+      responses:
+        '200':
+          description: 200 OK
+          schema:
+            $ref: '#/definitions/TelePackages'
+        '400':
+          description: Bad request. Plz check your query params.
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: not found (nothing happens)
+        '500':
+          description: Internal Server Error (nothing happens)
+
   /{tid}/fs:
     x-swagger-router-controller: file_system_controller
     get:
@@ -122,6 +138,37 @@ paths:
             type: array
             items:
               $ref: '#/definitions/File'
+        '400':
+          description: Bad request. Plz check your query params.
+        '401':
+          description: Authorization information is missing or invalid.
+        '404':
+          description: not found (nothing happens)
+        '500':
+          description: Internal Server Error (nothing happens)
+  
+  /{tid}/cmd/{id}:
+    x-swagger-router-controller: file_system_controller
+    get:
+      description: Request the status of a command
+      # used as the method name of the controller
+      operationId: cmdStatus
+      parameters:
+        - in: path
+          name: tid
+          description: The Target ID - The ID of the target spacecraft
+          required: true
+          type: string
+        - in: path
+          name: id
+          description: File's name on the spacecraft
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 200 OK (send a command to the spacecraft)
+          schema:
+            $ref: '#/definitions/StatusFile'
         '400':
           description: Bad request. Plz check your query params.
         '401':
@@ -200,10 +247,9 @@ paths:
           type: string
       responses:
         '200':
-          description: A PNG file
+          description: An octet stream file
           schema:
-            type: string
-            format: binary
+            $ref: '#/definitions/File'
         '400':
           description: Bad request. Plz check your query params.
         '401':
@@ -218,7 +264,7 @@ paths:
 #    get:
 #      description: request to download a file from the spacecraft to ground station
 #      # used as the method name of the controller
-#      operationId: dlSpToGr
+#      operationId: dlFile
 #      parameters:
 #        - in: path
 #          name: tid
@@ -292,6 +338,39 @@ paths:
   #upload_controller -- END
   #########################
 
+  ##############################
+  #hello_pts controller -- BEGIN
+  ##############################
+
+  /hello:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: hello_pts
+    get:
+      description: Returns 'Hello' to the caller
+      # used as the method name of the controller
+      operationId: hello
+      parameters:
+      - in: query
+        name: name
+        description: The name of the person to whom to say hello
+        required: false
+        type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/HelloPTSResponse"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+  ############################
+  #hello_pts controller -- END
+  ############################
+
   #################
   #swagger -- BEGIN
   #################
@@ -308,6 +387,16 @@ paths:
 ##################################################
 
 definitions:
+  Package:
+    title: a package
+    type: object
+    properties:
+      id:
+        type: number
+      data:
+        type: string
+      timestamp:
+        type: string
   File:
     title: a File
     description: A File either on the ground/spacecraft
@@ -332,6 +421,45 @@ definitions:
       location:
         type: string
         description: Files on the ground or spacecraft.
+  StatusFile:
+    title: a Status File
+    description: A File either on the ground/spacecraft
+    type: object
+    required:
+      - tid
+      - id
+    properties:
+      tid:
+        type: string
+        description: The target ID (ID of the spacecraft)
+        example: ALQ-1, ALQ-2, ALINA
+      id:
+        type: string
+        description: The ID of command
+        example: 1,2,3
+      isComplete:
+        type: boolean
+        description: The Status of a Command
+  TelePackages:
+    title: telemetry packages
+    description: telemetry packages
+    type: object
+    required:
+      - tid
+    properties:
+      tid:
+        type: string
+        description: The target ID (ID of the spacecraft)
+        example: ALQ-1, ALQ-2, ALINA
+      packetcount:
+        type: number
+        description: packet count
+        example: 22
+      packages:
+        type: array
+        items:
+          $ref: "#/definitions/Package"
+
   HelloPTSResponse:
     required:
       - message

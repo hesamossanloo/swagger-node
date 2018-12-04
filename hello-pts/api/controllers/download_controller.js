@@ -21,7 +21,7 @@ var file_1 = {
     "size": "121b",
     "name": "image1",
     "permissions": "admin,dev",
-    "location": "SPACECRAFT"
+    "location": "GROUND"
 }
 var file_2 = {
     "tid": "2",
@@ -85,34 +85,54 @@ function getAllDownloadFiles(req, res) {
 }
 function downloadFile(req, res) {
 
-    var tid = req.swagger.params.tid.value || 'No tid provided';
-    var filename = req.swagger.params.filename.value || 'No filename provided';
-    var location = req.swagger.params.location.value || 'No location provided';
+//    var tid = req.swagger.params.tid.value || 'No tid provided';
+//    var filename = req.swagger.params.filename.value || 'No filename provided';
+//    var location = req.swagger.params.location.value || 'No location provided';
+//
+//    var file = findFile(tid,filename, location);
 
-    var spacecraftFilesBasedOnLocation = findByTIDandLocation(tid,location);
+
+//    let ret;
+
+//    if(foundItem){
+//        ret= "Good news, file exists!";
+//    } else {
+//        ret= 'Either Target ID not found!';
+//    }
+
+// this sends back a JSON response which is an json object
+//    res.json(retSpacecraftFilesBasedOnLocation);
+
+    // this sends back a JSON response which is an json object
+//    res.json(file);
+    res.json(file_1);
+
+}
+
+function findFile(tid, filename, location) {
+    var spacecraftAllFiles = filesList[tid];
+    if (spacecraftAllFiles === undefined) {
+        return "Target ID not found!";
+    }
+
+    var retSpacecraftFilesBasedOnLocation = spacecraftAllFiles[location];
+    if (retSpacecraftFilesBasedOnLocation === undefined) {
+        return "Location not found!";
+    }
 
     var foundItem = false;
+    let item;
 
     if (spacecraftFilesBasedOnLocation.length !== undefined) {
         if(spacecraftFilesBasedOnLocation.find(x => x.name === filename)){
             foundItem = true;
-            if(filename.indexOf('image') ==-1){
-                var img = fs.readFileSync('./images/pts1.png');
-                res.writeHead(200, {'Content-Type': 'image/png' });
-                res.end(img, 'binary');
-            }
+            item=x;
+//            if(filename.indexOf('image') ==-1){
+//                var img = fs.readFileSync('./images/pts1.png');
+//                res.writeHead(200, {'Content-Type': 'image/png' });
+//                res.end(img, 'binary');
+//            }
         }
     }
-
-    let ret;
-
-    if(foundItem){
-        ret= "Good news, file exists!";
-    } else {
-        ret= 'Either Target ID not found!';
-    }
-
-    // this sends back a JSON response which is an json object
-    res.json(ret);
-
+    return item;
 }

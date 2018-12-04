@@ -5,6 +5,9 @@ var util = require('util');
 module.exports = {
     allFS: getAllFiles,
     dlSpToGrRq: requestToDownloadAFileFromSpacecraftToGround,
+    cmdStatus: mockStatusOfCommand,
+    stdTelePackages: mockTelePackages,
+    relTelePackages: mockTelePackages
 };
 
 /*
@@ -15,6 +18,23 @@ var alina = [];
 var alq1 = [];
 var alq2 = [];
 
+var statusCmdJson ={
+   "tid": "1",
+   "id": "1",
+   "isComplete":  true
+}
+var telePackages ={
+   "tid": "1",
+   "packetcount":2,
+   "packages":[
+   {"id":1,
+    "data":"data1",
+    "timestamp":"01-01-2021-09:09:09:999"},
+   {"id":2,
+    "data":"data2",
+    "timestamp":"01-01-2021-10:10:09:999"}
+   ]
+}
 var file_1 = {
     "tid": "1",
     "size": "121b",
@@ -116,4 +136,17 @@ function requestToDownloadAFileFromSpacecraftToGround(req, res) {
 
     // this sends back a JSON response which is an json object
     res.json(ret);
+}
+
+function mockAJsonFile(req, res) {
+    res.json(file_1);
+}
+function mockArrayOfJsonFiles(req, res) {
+    res.json(alina["GROUND"]);
+}
+function mockStatusOfCommand(req, res) {
+    res.json(statusCmdJson);
+}
+function mockTelePackages(req, res) {
+    res.json(telePackages);
 }
